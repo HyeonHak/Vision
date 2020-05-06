@@ -214,15 +214,16 @@ void Mat_change(float **Mat, int N, int M)
         cout << col[i] << " ";
     cout << endl;
 
+    cout<<"START\n";
     //row = false && col = true
-    int MIN_VALUE = FLT_MAX;
+    float MIN_VALUE = FLT_MAX;
     for (int i = 0; i < N; i++)
     {
-        if (!row[i])
+        if (row[i])
         {
             for (int j = 0; j < M; j++)
             {
-                if (col[j])
+                if (!col[j])
                 {
                     if (MIN_VALUE > Mat[i][j])
                         MIN_VALUE = Mat[i][j];
@@ -230,15 +231,17 @@ void Mat_change(float **Mat, int N, int M)
             }
         }
     }
-
+    cout<<MIN_VALUE<<endl;
     for (int i = 0; i < N; i++)
     {
         for (int j = 0; j < M; j++)
         {
             if (!row[i] && col[j])
-                Mat[i][j] -= MIN_VALUE;
-            else
                 Mat[i][j] += MIN_VALUE;
+            else if (Mat[i][j] == 0)
+                continue;
+            else
+                Mat[i][j] -= MIN_VALUE;
         }
     }
 
