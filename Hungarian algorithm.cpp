@@ -2,7 +2,7 @@
 #include <float.h>
 using namespace std;
 
-int     Mat_check(const float **Mat, const int N, const int M)
+int     Mat_check(float **Mat, const int N, const int M)
 {
     int *arr = new int[N];
     int *arr_col = new int[M];
@@ -54,20 +54,17 @@ int     Mat_check(const float **Mat, const int N, const int M)
     return (true);
 }
 
-void    make_minimum_mat(const float **Cost, float **Mat, const int N, const int M, int &MIN_ROW, int &MIN_COL)
+void    make_minimum_mat(float **Cost, float **Mat, const int N, const int M)
 {
     float MIN;
-
+    
     for (int i=0;i<N;i++)
     {
         MIN = FLT_MAX;
         for (int j=0;j<M;j++)
         {
             if (Cost[i][j] < MIN)
-            {
                 MIN = Cost[i][j];
-                MIN_ROW = i;
-            }
         }
         for (int j=0;j<M;j++)
             Mat[i][j] = Cost[i][j] - MIN;
@@ -78,23 +75,20 @@ void    make_minimum_mat(const float **Cost, float **Mat, const int N, const int
         MIN = FLT_MAX;
         for (int j=0;j<N;j++)
         {
-            if (Cost[i][j] < MIN)
-            {
+            if (Mat[i][j] < MIN)
                 MIN = Mat[i][j];
-                MIN_COL = i;
-            }
         }
         for (int j=0;j<N;j++)
             Mat[i][j] = Mat[i][j] - MIN;
     }
 }
 
-void    DFS(const float **Mat, const int N, const int M, int i, int j)
+void    DFS(float **Mat, const int N, const int M, int i, int j)
 {
     
 }
 
-float   calc_mat(const float **Mat, const int N, const int M, const int MODE, float *assignment_index)
+float   calc_mat(float **Mat, const int N, const int M, const int MODE, float *assignment_index)
 {
     float ret = 0;
     int *arr = new int[N];
@@ -116,7 +110,7 @@ float   calc_mat(const float **Mat, const int N, const int M, const int MODE, fl
     return (ret);
 }
 
-float   Solve(const float **Cost, const int N, const int M, const int MODE, float *assignment_index)
+float   Solve(float **Cost, const int N, const int M, const int MODE, float *assignment_index)
 {
     float   ret;
     int     min_row, min_col;
@@ -126,9 +120,20 @@ float   Solve(const float **Cost, const int N, const int M, const int MODE, floa
         Mat[i] = new float[M];
 
     make_minimum_mat(Cost, Mat, N, M, min_row, min_col);
+    for (int i=0;i<N;i++)
+    {
+        for (int j=0;j<M;j++)
+        {
+            cout<<Mat[i][j]<<" ";
+        }
+        cout<<endl;
+    }
+    cout<<endl;
+    return (ret);
     while(!Mat_check(Mat, N, M))
     {
-
+        cout<<"fail";
+        break;
     }
     ret = calc_mat(Mat, N, M, MODE, assignment_index);
     for (int i=0;i<N;i++)
@@ -141,6 +146,9 @@ int main(void)
 {
     int N, M, MODE;
     float input;
+
+    
+
 
     cout<<" Input row, column : ";
     cin>>N>>M;
