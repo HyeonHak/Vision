@@ -110,6 +110,52 @@ float   calc_mat(float **Mat, const int N, const int M, const int MODE, float *a
     return (ret);
 }
 
+void    Mat_change(float **Mat, int N, int M)
+{
+    //check 배열 2차원..?
+    float MIN = FLT_MAX;
+    int **check = new int *[N];
+    for (int i=0;i<N;i++) check[i] = new int[M];
+    for (int i=0;i<N;i++)
+        for (int j=0;j<M;j++) check[i][j] = 0;
+
+    for (int i=0;i<N;i++)
+    {
+        for (int j=0;j<M;j++)
+        {
+            if (Mat[i][j] == 0)
+            {
+                if (check[i][j] == 0)
+                {
+                    check[i][j] = 1;
+                    for (int k=0;k<N;k++)
+                    {
+                        if (Mat[k][j] == 0 && k != i)
+                            check[k][j] = -1;
+                    }
+                    for (int k=j + 1;k<M;k++)
+                    {
+                        if (Mat[i][k] == 0)
+                            check[i][k] = -1;
+                    }
+                    break;
+                }
+                else
+                    check[i][j] = -1;
+            }
+        }
+    }
+
+    for (int i=0;i<N;i++)
+    {
+        for (int j=0;j<M;j++)
+        {
+            cout<<check[i][j]<<" ";
+        }
+        cout<<endl;
+    }
+}
+
 float   Solve(float **Cost, const int N, const int M, const int MODE, float *assignment_index)
 {
     float   ret;
@@ -119,7 +165,7 @@ float   Solve(float **Cost, const int N, const int M, const int MODE, float *ass
     for (int i=0;i<M;i++)
         Mat[i] = new float[M];
 
-    make_minimum_mat(Cost, Mat, N, M, min_row, min_col);
+    make_minimum_mat(Cost, Mat, N, M);
     for (int i=0;i<N;i++)
     {
         for (int j=0;j<M;j++)
@@ -128,10 +174,11 @@ float   Solve(float **Cost, const int N, const int M, const int MODE, float *ass
         }
         cout<<endl;
     }
-    cout<<endl;
-    return (ret);
+    
     while(!Mat_check(Mat, N, M))
     {
+        Mat_change(Mat, N, M);
+        return (ret);
         cout<<"fail";
         break;
     }
@@ -146,9 +193,6 @@ int main(void)
 {
     int N, M, MODE;
     float input;
-
-    
-
 
     cout<<" Input row, column : ";
     cin>>N>>M;
