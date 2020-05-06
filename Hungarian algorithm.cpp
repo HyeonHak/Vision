@@ -115,9 +115,18 @@ void    Mat_change(float **Mat, int N, int M)
     //check 배열 2차원..?
     float MIN = FLT_MAX;
     int **check = new int *[N];
+    bool *row = new bool [N];
+    bool *col = new bool [M];
+
     for (int i=0;i<N;i++) check[i] = new int[M];
     for (int i=0;i<N;i++)
-        for (int j=0;j<M;j++) check[i][j] = 0;
+    {
+        row[i] = false;
+        for (int j=0;j<M;j++) {
+            check[i][j] = 0;
+            col[j] = false;
+        }
+    }
 
     for (int i=0;i<N;i++)
     {
@@ -154,6 +163,52 @@ void    Mat_change(float **Mat, int N, int M)
         }
         cout<<endl;
     }
+
+    for (int i=0;i<N;i++)
+    {
+        bool flag = false;
+        for (int j=0;j<M;j++)
+        {
+            if (check[i][j] == 1)
+            {
+                flag = true;
+                row[i] = false;
+                break;
+            }
+        }
+        if (!flag)
+            row[i] = true;
+    }
+    for (int i=0;i<N;i++)
+    {
+        if (row[i])
+        {
+            for (int j=0;j<M;j++)
+            {
+                if (Mat[i][j] == 0)
+                    col[j] = true;
+            }
+        }
+    }
+    for (int i=0;i<M;i++)
+    {
+        if (col[i])
+        {
+            bool flag = 0;
+            for (int j=0;j<N;j++)
+            {
+                if (check[i][j] == 1)
+                    row[j] = true;
+            }
+        }
+    }
+
+    for (int i=0;i<N;i++)
+        cout<<row[i]<<" ";
+    cout<<endl;
+    for (int i=0;i<M;i++)
+        cout<<col[i]<<" ";
+    cout<<endl;
 }
 
 float   Solve(float **Cost, const int N, const int M, const int MODE, float *assignment_index)
