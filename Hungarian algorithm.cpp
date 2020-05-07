@@ -77,11 +77,12 @@ void make_minimum_mat(float **Cost, float **Mat, const int N, const int M)
         MIN = FLT_MAX;
         for (int j = 0; j < N; j++)
         {
-            if (Mat[i][j] < MIN)
-                MIN = Mat[i][j];
+            if (Mat[j][i] < MIN)
+                MIN = Mat[j][i];
         }
+        cout << "MIN: " << MIN << endl;
         for (int j = 0; j < N; j++)
-            Mat[i][j] = Mat[i][j] - MIN;
+            Mat[j][i] = Mat[j][i] - MIN;
     }
 }
 
@@ -95,25 +96,14 @@ float calc_mat(float **Mat, const int N, const int M, const int MODE, float *ass
     int *arr = new int[N];
     for (int i = 0; i < N; i++)
         arr[i] = 0;
-    for (int i = 0; i < N; i++)
-    {
-        if (arr[i] == 0)
-        {
-            for (int j = 0; j < M; j++)
-            {
-                if (Mat[i][j] == 0)
-                {
-                    DFS(Mat, N, M, i, j);
-                }
-            }
-        }
-    }
     delete[] arr;
     return (ret);
 }
 
 int Step3_Mark(int **check, float **Mat, bool *col, bool *row, int N, int M, int zero_cnt)
 {
+    int ret = 0;
+
     //Mark all columns having zeros in newly marked row(s)
     for (int i = 0; i < N; i++)
     {
@@ -121,8 +111,11 @@ int Step3_Mark(int **check, float **Mat, bool *col, bool *row, int N, int M, int
         {
             for (int j = 0; j < M; j++)
             {
-                if (Mat[i][j] == 0)
+                if (Mat[i][j] == 0 && col[j] == false)
+                {
                     col[j] = true;
+                    ret = 1;
+                }
             }
         }
     }
@@ -135,11 +128,15 @@ int Step3_Mark(int **check, float **Mat, bool *col, bool *row, int N, int M, int
             bool flag = 0;
             for (int j = 0; j < N; j++)
             {
-                if (check[j][i] == 1)
+                if (check[j][i] == 1 && row[j] == false)
+                {
                     row[j] = true;
+                    ret = 1;
+                }
             }
         }
     }
+    return (ret);
     for (int i = 0; i < N; i++)
     {
         if (row[i])
@@ -154,7 +151,7 @@ int Step3_Mark(int **check, float **Mat, bool *col, bool *row, int N, int M, int
     return (0);
 }
 
-void Mat_change(float **Mat, int N, int M)
+int Mat_change(float **Mat, int N, int M)
 {
     //check 배열 2차원..?
     float MIN = FLT_MAX;
@@ -178,6 +175,7 @@ void Mat_change(float **Mat, int N, int M)
         }
     }
 
+    int ret = 0;
     //check init (step 3 assign)
     for (int i = 0; i < N; i++)
     {
@@ -188,6 +186,7 @@ void Mat_change(float **Mat, int N, int M)
                 if (check[i][j] == 0)
                 {
                     check[i][j] = 1;
+                    ret++;
                     for (int k = 0; k < N; k++)
                     {
                         if (Mat[k][j] == 0 && k != i)
@@ -205,7 +204,8 @@ void Mat_change(float **Mat, int N, int M)
             }
         }
     }
-
+    if (ret == N)
+        return (1);
     for (int i = 0; i < N; i++)
     {
         for (int j = 0; j < M; j++)
@@ -281,8 +281,15 @@ void Mat_change(float **Mat, int N, int M)
     {
         for (int j = 0; j < M; j++)
         {
-            if (!row[i] && col[j])
-                Mat[i][j] += MIN_VALUE;
+            if (!row[i])
+            {
+                if (col[j])
+                    Mat[i][j] += MIN_VALUE;
+                else
+                    continue;
+            }
+            else if (col[j])
+                continue;
             else if (Mat[i][j] == 0)
                 continue;
             else
@@ -294,10 +301,12 @@ void Mat_change(float **Mat, int N, int M)
     {
         for (int j = 0; j < M; j++)
         {
+            check[i][j] = 0;
             cout << Mat[i][j] << " ";
         }
         cout << endl;
     }
+    return (0);
 }
 
 float Solve(float **Cost, const int N, const int M, const int MODE, float *assignment_index)
@@ -319,13 +328,16 @@ float Solve(float **Cost, const int N, const int M, const int MODE, float *assig
         cout << endl;
     }
 
-    while (!Mat_check(Mat, N, M))
+    //while (!Mat_check(Mat, N, M))
+    //{
+    while (Mat_change(Mat, N, M) == 0)
     {
-        Mat_change(Mat, N, M);
-        return (ret);
-        cout << "fail";
-        break;
     }
+    /*return (ret);
+        cout << "fail";
+        break;*/
+    //}
+    return (ret);
     ret = calc_mat(Mat, N, M, MODE, assignment_index);
     for (int i = 0; i < N; i++)
         delete[] Mat[i];
