@@ -344,12 +344,13 @@ float Solve(float **Cost, const int N, const int M, const int MODE, float *assig
     float total = 0;
     for (int i = 0; i < N; i++)
     {
-        total += Mat[i][(int)assignment_index[i]];
+        total += Cost[i][(int)assignment_index[i]];
+        cout << "COST" << Cost[i][(int)assignment_index[i]] << endl;
         cout << assignment_index[i] << " ";
     }
 
     cout << "\n"
-         << total;
+         << total << "\n";
     return (ret);
     ret = calc_mat(Mat, N, M, MODE, assignment_index);
     for (int i = 0; i < N; i++)
