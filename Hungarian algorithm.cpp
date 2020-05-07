@@ -112,6 +112,48 @@ float calc_mat(float **Mat, const int N, const int M, const int MODE, float *ass
     return (ret);
 }
 
+int Step3_Mark(int **check, float **Mat, bool *col, bool *row, int N, int M, int zero_cnt)
+{
+    //Mark all columns having zeros in newly marked row(s)
+    for (int i = 0; i < N; i++)
+    {
+        if (row[i])
+        {
+            for (int j = 0; j < M; j++)
+            {
+                if (Mat[i][j] == 0)
+                    col[j] = true;
+            }
+        }
+    }
+
+    //Mark all rows having assignments in newly marked columns
+    for (int i = 0; i < M; i++)
+    {
+        if (col[i])
+        {
+            bool flag = 0;
+            for (int j = 0; j < N; j++)
+            {
+                if (check[j][i] == 1)
+                    row[j] = true;
+            }
+        }
+    }
+    for (int i = 0; i < N; i++)
+    {
+        if (row[i])
+        {
+            for (int j = 0; j < M; j++)
+            {
+                if (!col[j] && Mat[i][j] == 0)
+                    return (1);
+            }
+        }
+    }
+    return (0);
+}
+
 void Mat_change(float **Mat, int N, int M)
 {
     //check 배열 2차원..?
@@ -119,7 +161,9 @@ void Mat_change(float **Mat, int N, int M)
     int **check = new int *[N];
     bool *row = new bool[N];
     bool *col = new bool[M];
+    int zero_cnt = 0;
 
+    //init
     for (int i = 0; i < N; i++)
         check[i] = new int[M];
     for (int i = 0; i < N; i++)
@@ -127,11 +171,14 @@ void Mat_change(float **Mat, int N, int M)
         row[i] = false;
         for (int j = 0; j < M; j++)
         {
+            if (Mat[i][j] == 0)
+                zero_cnt++;
             check[i][j] = 0;
             col[j] = false;
         }
     }
 
+    //check init (step 3 assign)
     for (int i = 0; i < N; i++)
     {
         for (int j = 0; j < M; j++)
@@ -168,6 +215,7 @@ void Mat_change(float **Mat, int N, int M)
         cout << endl;
     }
 
+    //Mark all rows having no assignments
     for (int i = 0; i < N; i++)
     {
         bool flag = false;
@@ -183,30 +231,27 @@ void Mat_change(float **Mat, int N, int M)
         if (!flag)
             row[i] = true;
     }
+    cout << "INIT\n";
     for (int i = 0; i < N; i++)
+        cout << row[i] << " ";
+    cout << endl;
+    for (int j = 0; j < M; j++)
+        cout << col[j] << " ";
+    cout << endl;
+    cout << endl;
+    //step 3 (Mark)
+    while (Step3_Mark(check, Mat, col, row, N, M, zero_cnt))
     {
-        if (row[i])
-        {
-            for (int j = 0; j < M; j++)
-            {
-                if (Mat[i][j] == 0)
-                    col[j] = true;
-            }
-        }
-    }
-    for (int i = 0; i < M; i++)
-    {
-        if (col[i])
-        {
-            bool flag = 0;
-            for (int j = 0; j < N; j++)
-            {
-                if (check[i][j] == 1)
-                    row[j] = true;
-            }
-        }
+        for (int i = 0; i < N; i++)
+            cout << row[i] << " ";
+        cout << endl;
+        for (int j = 0; j < M; j++)
+            cout << col[j] << " ";
+        cout << endl;
+        cout << endl;
     }
 
+    cout << "ROW\n";
     for (int i = 0; i < N; i++)
         cout << row[i] << " ";
     cout << endl;
@@ -214,7 +259,7 @@ void Mat_change(float **Mat, int N, int M)
         cout << col[i] << " ";
     cout << endl;
 
-    cout<<"START\n";
+    cout << "START\n";
     //row = false && col = true
     float MIN_VALUE = FLT_MAX;
     for (int i = 0; i < N; i++)
@@ -231,7 +276,7 @@ void Mat_change(float **Mat, int N, int M)
             }
         }
     }
-    cout<<MIN_VALUE<<endl;
+    cout << MIN_VALUE << endl;
     for (int i = 0; i < N; i++)
     {
         for (int j = 0; j < M; j++)
