@@ -48,15 +48,6 @@ void make_maximum_mat(float **Cost, float **Mat, const int N, const int M)
             Mat[i][j] = MAX - Cost[i][j];
     }
 
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < N; j++)
-        {
-            cout << Mat[i][j] << " ";
-        }
-        cout << endl;
-    }
-    cout << endl;
     for (int i = 0; i < M; i++)
     {
         MIN = FLT_MAX;
@@ -295,7 +286,6 @@ int Mat_change(float **Mat, int N, int M, float *assignment_index, int MODE)
 
     int ret = 0;
     //check init (step 3 assign)
-    cout << "START\n";
 
     if (is_vaild(N, Mat, assignment_index, MODE) == 1)
         return (1);
@@ -373,7 +363,6 @@ float Solve(float **Cost, const int N, const int M, const int MODE, float *assig
         make_minimum_mat(Cost, Mat, N, M);
     else if (MODE == 1)
         make_maximum_mat(Cost, Mat, N, M);
-    int ret2 = 0;
     while (Mat_change(Mat, N, M, assignment_index, MODE) == 0)
     {
     }
