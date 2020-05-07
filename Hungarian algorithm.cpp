@@ -80,14 +80,10 @@ void make_minimum_mat(float **Cost, float **Mat, const int N, const int M)
             if (Mat[j][i] < MIN)
                 MIN = Mat[j][i];
         }
-        cout << "MIN: " << MIN << endl;
+        //cout << "MIN: " << MIN << endl;
         for (int j = 0; j < N; j++)
             Mat[j][i] = Mat[j][i] - MIN;
     }
-}
-
-void DFS(float **Mat, const int N, const int M, int i, int j)
-{
 }
 
 float calc_mat(float **Mat, const int N, const int M, const int MODE, float *assignment_index)
@@ -151,7 +147,7 @@ int Step3_Mark(int **check, float **Mat, bool *col, bool *row, int N, int M, int
     return (0);
 }
 
-int Mat_change(float **Mat, int N, int M)
+int Mat_change(float **Mat, int N, int M, float *assignment_index)
 {
     //check 배열 2차원..?
     float MIN = FLT_MAX;
@@ -186,6 +182,7 @@ int Mat_change(float **Mat, int N, int M)
                 if (check[i][j] == 0)
                 {
                     check[i][j] = 1;
+                    assignment_index[ret] = j;
                     ret++;
                     for (int k = 0; k < N; k++)
                     {
@@ -206,14 +203,14 @@ int Mat_change(float **Mat, int N, int M)
     }
     if (ret == N)
         return (1);
-    for (int i = 0; i < N; i++)
+    /*for (int i = 0; i < N; i++)
     {
         for (int j = 0; j < M; j++)
         {
             cout << check[i][j] << " ";
         }
         cout << endl;
-    }
+    }*/
 
     //Mark all rows having no assignments
     for (int i = 0; i < N; i++)
@@ -231,27 +228,27 @@ int Mat_change(float **Mat, int N, int M)
         if (!flag)
             row[i] = true;
     }
-    cout << "INIT\n";
+    /*cout << "INIT\n";
     for (int i = 0; i < N; i++)
         cout << row[i] << " ";
     cout << endl;
     for (int j = 0; j < M; j++)
         cout << col[j] << " ";
     cout << endl;
-    cout << endl;
+    cout << endl;*/
     //step 3 (Mark)
     while (Step3_Mark(check, Mat, col, row, N, M, zero_cnt))
     {
-        for (int i = 0; i < N; i++)
+        /*for (int i = 0; i < N; i++)
             cout << row[i] << " ";
         cout << endl;
         for (int j = 0; j < M; j++)
             cout << col[j] << " ";
         cout << endl;
-        cout << endl;
+        cout << endl;*/
     }
 
-    cout << "ROW\n";
+    /*cout << "ROW\n";
     for (int i = 0; i < N; i++)
         cout << row[i] << " ";
     cout << endl;
@@ -259,7 +256,7 @@ int Mat_change(float **Mat, int N, int M)
         cout << col[i] << " ";
     cout << endl;
 
-    cout << "START\n";
+    cout << "START\n";*/
     //row = false && col = true
     float MIN_VALUE = FLT_MAX;
     for (int i = 0; i < N; i++)
@@ -276,7 +273,7 @@ int Mat_change(float **Mat, int N, int M)
             }
         }
     }
-    cout << MIN_VALUE << endl;
+    //cout << MIN_VALUE << endl;
     for (int i = 0; i < N; i++)
     {
         for (int j = 0; j < M; j++)
@@ -306,6 +303,7 @@ int Mat_change(float **Mat, int N, int M)
         }
         cout << endl;
     }
+    cout << endl;
     return (0);
 }
 
@@ -330,13 +328,28 @@ float Solve(float **Cost, const int N, const int M, const int MODE, float *assig
 
     //while (!Mat_check(Mat, N, M))
     //{
-    while (Mat_change(Mat, N, M) == 0)
+    while (Mat_change(Mat, N, M, assignment_index) == 0)
     {
     }
     /*return (ret);
         cout << "fail";
         break;*/
     //}
+    for (int i = 0; i < N; i++)
+    {
+        for (int j = 0; j < M; j++)
+            cout << Mat[i][j] << " ";
+        cout << endl;
+    }
+    float total = 0;
+    for (int i = 0; i < N; i++)
+    {
+        total += Mat[i][(int)assignment_index[i]];
+        cout << assignment_index[i] << " ";
+    }
+
+    cout << "\n"
+         << total;
     return (ret);
     ret = calc_mat(Mat, N, M, MODE, assignment_index);
     for (int i = 0; i < N; i++)
