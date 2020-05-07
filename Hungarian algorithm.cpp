@@ -163,16 +163,7 @@ int is_vaild(int N, float **Mat, float *assignment_index, int MODE)
             }
         }
     }
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < N; j++)
-        {
-            cout << check[i][j] << " ";
-        }
-        cout << endl;
-    }
-    cout << endl;
-    cout << "COL\n";
+
     flag = 1;
     while (flag)
     {
@@ -217,19 +208,9 @@ int is_vaild(int N, float **Mat, float *assignment_index, int MODE)
     {
         for (int j = 0; j < N; j++)
         {
-            cout << check[i][j] << " ";
-        }
-        cout << endl;
-    }
-    cout << endl;
-
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < N; j++)
-        {
             if (Mat[i][j] == 0 && check[i][j] == 0)
             {
-
+                ans++;
                 for (int k = 0; k < N; k++)
                 {
                     if (Mat[i][k] == 0 && check[i][k] == 0)
@@ -238,28 +219,10 @@ int is_vaild(int N, float **Mat, float *assignment_index, int MODE)
                         check[k][j] = -1;
                 }
                 check[i][j] = 1;
-                for (int i = 0; i < N; i++)
-                {
-                    for (int j = 0; j < N; j++)
-                    {
-                        cout << check[i][j] << " ";
-                    }
-                    cout << endl;
-                }
-                cout << endl;
             }
         }
     }
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < N; j++)
-        {
-            cout << check[i][j] << " ";
-        }
-        cout << endl;
-    }
-    cout << endl;
-    cout << "FUCK : " << ans << endl;
+
     int value = 0;
     for (int i = 0; i < N; i++)
     {
@@ -276,39 +239,6 @@ int is_vaild(int N, float **Mat, float *assignment_index, int MODE)
     if (ans == N)
         return (1);
     return (-1);
-
-    /*int ret = 0;
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < N; j++)
-        {
-            if (Mat[i][j] == 0)
-            {
-                if (check[i][j] == 0)
-                {
-                    check[i][j] = 1;
-                    assignment_index[ret] = j;
-                    ret++;
-                    for (int k = 0; k < N; k++)
-                    {
-                        if (Mat[k][j] == 0 && k != i)
-                            check[k][j] = -1;
-                    }
-                    for (int k = j + 1; k < N; k++)
-                    {
-                        if (Mat[i][k] == 0)
-                            check[i][k] = -1;
-                    }
-                    break;
-                }
-                else
-                    check[i][j] = -1;
-            }
-        }
-    }
-    if (ret == N)
-        return (1);
-    return (-1);*/
 }
 
 void check_set(int N, float **Mat, int **check)
@@ -369,42 +299,8 @@ int Mat_change(float **Mat, int N, int M, float *assignment_index, int MODE)
 
     if (is_vaild(N, Mat, assignment_index, MODE) == 1)
         return (1);
-    //    return (1);
-    cout << "FUCK\n";
     check_set(N, Mat, check);
-    /*
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < M; j++)
-        {
-            if (Mat[i][j] == 0)
-            {
-                if (check[i][j] == 0)
-                {
-                    check[i][j] = 1;
-                    assignment_index[ret] = j;
-                    ret++;
-                    for (int k = 0; k < N; k++)
-                    {
-                        if (Mat[k][j] == 0 && k != i)
-                            check[k][j] = -1;
-                    }
-                    for (int k = j + 1; k < M; k++)
-                    {
-                        if (Mat[i][k] == 0)
-                            check[i][k] = -1;
-                    }
-                    break;
-                }
-                else
-                    check[i][j] = -1;
-            }
-        }
-    }
-    if (ret == N)
-        return (1);
-*/
-    //Mark all rows having no assignments
+
     for (int i = 0; i < N; i++)
     {
         bool flag = false;
@@ -461,16 +357,6 @@ int Mat_change(float **Mat, int N, int M, float *assignment_index, int MODE)
         }
     }
 
-    cout << endl;
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < M; j++)
-        {
-            cout << Mat[i][j] << " ";
-        }
-        cout << endl;
-    }
-    cout << "BYE";
     return (0);
 }
 
@@ -487,30 +373,9 @@ float Solve(float **Cost, const int N, const int M, const int MODE, float *assig
         make_minimum_mat(Cost, Mat, N, M);
     else if (MODE == 1)
         make_maximum_mat(Cost, Mat, N, M);
-
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < N; j++)
-        {
-            cout << Mat[i][j] << " ";
-        }
-        cout << endl;
-    }
-    cout << endl;
     int ret2 = 0;
     while (Mat_change(Mat, N, M, assignment_index, MODE) == 0)
     {
-        if (ret2 == 3)
-            break;
-        ret2++;
-    }
-    for (int i = 0; i < N; i++)
-    {
-        for (int j = 0; j < M; j++)
-        {
-            cout << Mat[i][j] << " ";
-        }
-        cout << endl;
     }
 
     for (int i = 0; i < N; i++)
