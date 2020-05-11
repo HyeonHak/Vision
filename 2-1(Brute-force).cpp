@@ -23,6 +23,8 @@ int Solved(vector<int> &vec)
 {
 	int i, j, tmp_val;
 	int ret = INT_MIN;
+	int start = 0;
+	int end = 0;
 	int SIZE = vec.size();
 
 	for (i = 0; i < SIZE; i++)
@@ -32,9 +34,14 @@ int Solved(vector<int> &vec)
 		{
 			tmp_val += vec[j];
 			if (ret < tmp_val)
+			{
 				ret = tmp_val;
+				start = i;
+				end = j;
+			}
 		}
 	}
+	cout<<start<<" "<<end<<"\n";
 	return (ret);
 }
 

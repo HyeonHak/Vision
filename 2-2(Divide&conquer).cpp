@@ -21,7 +21,7 @@ void Input(vector<int> &vec)
 	}
 }
 
-int divide_conquer(int left, int right, vector<int> &vec)
+int divide_conquer(int left, int right, vector<int> &vec, int *LEFT, int *RIGHT)
 {
 	if (left == right)
 		return (vec[left]);
@@ -45,24 +45,26 @@ int divide_conquer(int left, int right, vector<int> &vec)
 	return (max({divide_conquer(left, mid, vec), divide_conquer(mid + 1, right, vec), left_max + right_max}));
 }
 
-int Solved(vector<int> &vec)
+int Solved(vector<int> &vec, int *LEFT, int *RIGHT)
 {
 	int left, right, ret;
 	int SIZE = vec.size();
 
 	left = 0;
 	right = SIZE - 1;
-	ret = divide_conquer(left, right, vec);
+	ret = divide_conquer(left, right, vec, LEFT, RIGHT);
 	return (ret);
 }
 
 int main(void)
 {
 	clock_t start, end;
+	int LEFT, RIGHT;
+	LEFT = RIGHT = 0;
 	vector<int> vec;
 	Input(vec);
 	start = clock();
-	cout << Solved(vec) << "\n";
+	cout << Solved(vec, &LEFT, &RIGHT) << "\n";
 	end = clock();
 	printf("%f", (double)(end - start) / (CLOCKS_PER_SEC));
 }
