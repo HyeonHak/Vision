@@ -27,22 +27,53 @@ int divide_conquer(int left, int right, vector<int> &vec, int *LEFT, int *RIGHT)
 		return (vec[left]);
 	int mid = (left + right) / 2;
 	int left_max, right_max, tmp_val;
+	int tmp_left, tmp_right;
+
+
 	left_max = right_max = tmp_val = 0;
 
 	for (int i = mid; i >= left; i--)
 	{
 		tmp_val += vec[i];
 		if (tmp_val >= left_max)
+		{
 			left_max = tmp_val;
+			tmp_left = i;
+		}
 	}
 	tmp_val = 0;
 	for (int i = mid + 1; i <= right; i++)
 	{
 		tmp_val += vec[i];
 		if (tmp_val >= right_max)
+		{
 			right_max = tmp_val;
+			tmp_right = i;
+		}
 	}
-	return (max({divide_conquer(left, mid, vec), divide_conquer(mid + 1, right, vec), left_max + right_max}));
+	
+	int left_value = divide_conquer(left, mid, vec, LEFT, RIGHT);
+	int right_value = divide_conquer(mid + 1, right, vec, LEFT, RIGHT);
+	int current_value = left_max + right_max;
+	int max_value = max({left_value, right_value, current_value});
+	if (max_value == left_value)
+	{
+		*LEFT = left;
+		*RIGHT = mid;
+		return (left_value);
+	}
+	else if (max_value == right_value)
+	{
+		*LEFT = mid + 1;
+		*RIGHT = right;
+		return (right_value);
+	}
+	else
+	{
+		*LEFT = tmp_left;
+		*RIGHT = tmp_right;
+		return (current_value);
+	}
 }
 
 int Solved(vector<int> &vec, int *LEFT, int *RIGHT)
@@ -53,6 +84,7 @@ int Solved(vector<int> &vec, int *LEFT, int *RIGHT)
 	left = 0;
 	right = SIZE - 1;
 	ret = divide_conquer(left, right, vec, LEFT, RIGHT);
+	cout<<*LEFT<<" "<<*RIGHT<<"\n";
 	return (ret);
 }
 

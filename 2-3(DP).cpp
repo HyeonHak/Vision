@@ -24,15 +24,26 @@ int Solved(vector<int> &vec)
 {
 	int ret = INT_MIN;
 	int SIZE = vec.size();
+	int left, right;
+	int tmp_val;
 	vector<int> DP(SIZE, 0);
+
+  left = right = 0;
 	DP[0] = vec[0];
 
 	for (int i = 1; i < SIZE; i++)
 	{
-		DP[i] = max(DP[i - 1] + vec[i], vec[i]);
+		tmp_val = max(DP[i - 1] + vec[i], vec[i]);
+		if (tmp_val == vec[i])
+			left = right = i;
+		DP[i] = tmp_val;
 		if (ret < DP[i])
+		{
 			ret = DP[i];
+			right = i;
+		}
 	}
+	cout<<left<<" "<<right<<"\n";
 	return (ret);
 }
 

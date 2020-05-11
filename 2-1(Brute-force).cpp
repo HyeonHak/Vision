@@ -23,8 +23,8 @@ int Solved(vector<int> &vec)
 {
 	int i, j, tmp_val;
 	int ret = INT_MIN;
-	int start = 0;
-	int end = 0;
+	int left = 0;
+	int right = 0;
 	int SIZE = vec.size();
 
 	for (i = 0; i < SIZE; i++)
@@ -36,12 +36,12 @@ int Solved(vector<int> &vec)
 			if (ret < tmp_val)
 			{
 				ret = tmp_val;
-				start = i;
-				end = j;
+				left = i;
+				right = j;
 			}
 		}
 	}
-	cout<<start<<" "<<end<<"\n";
+	cout<<left<<" "<<right<<"\n";
 	return (ret);
 }
 

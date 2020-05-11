@@ -61,7 +61,7 @@ void make_maximum_mat(float **Cost, float **Mat, const int N, const int M)
     }
 }
 
-int Step3_Mark(int **check, float **Mat, bool *col, bool *row, int N, int M, int zero_cnt)
+int Step3_Mark(int **assign, float **Mat, bool *col, bool *row, int N, int M, int zero_cnt)
 {
     int ret = 0;
 
@@ -89,7 +89,7 @@ int Step3_Mark(int **check, float **Mat, bool *col, bool *row, int N, int M, int
             bool flag = 0;
             for (int j = 0; j < N; j++)
             {
-                if (check[j][i] == 1 && row[j] == false)
+                if (assign[j][i] == 1 && row[j] == false)
                 {
                     row[j] = true;
                     ret = 1;
@@ -109,13 +109,11 @@ int is_vaild(int N, float **Mat, float *assignment_index, int MODE)
     int **check = new int *[N];
 
     for (int i = 0; i < N; i++)
-        check[i] = new int[N];
-    for (int i = 0; i < N; i++)
     {
+        check[i] = new int[N];
         for (int j = 0; j < N; j++)
             check[i][j] = 0;
     }
-
     while (flag)
     {
         flag = 0;
@@ -139,14 +137,10 @@ int is_vaild(int N, float **Mat, float *assignment_index, int MODE)
             {
                 flag = 1;
                 ans++;
-                check[i][j_idx] = 1;
-                for (int i = 0; i < N; i++)
-                {
-                    if (Mat[i][j_idx] == 0)
-                        check[i][j_idx] = -1;
-                }
                 for (int k = 0; k < N; k++)
                 {
+                    if (Mat[k][j_idx] == 0)
+                        check[k][j_idx] = -1;
                     if (Mat[i][k] == 0)
                         check[i][k] = -1;
                 }
@@ -179,14 +173,10 @@ int is_vaild(int N, float **Mat, float *assignment_index, int MODE)
             {
                 flag = 1;
                 ans++;
-                check[i_idx][i] = 1;
-                for (int i = 0; i < N; i++)
-                {
-                    if (Mat[i_idx][i] == 0)
-                        check[i_idx][i] = -1;
-                }
                 for (int k = 0; k < N; k++)
                 {
+                    if (Mat[i_idx][k] == 0)
+                        check[i_idx][k] = -1;
                     if (Mat[k][i] == 0)
                         check[k][i] = -1;
                 }
@@ -194,7 +184,6 @@ int is_vaild(int N, float **Mat, float *assignment_index, int MODE)
             }
         }
     }
-
     for (int i = 0; i < N; i++)
     {
         for (int j = 0; j < N; j++)
@@ -213,7 +202,6 @@ int is_vaild(int N, float **Mat, float *assignment_index, int MODE)
             }
         }
     }
-
     int value = 0;
     for (int i = 0; i < N; i++)
     {
@@ -226,13 +214,12 @@ int is_vaild(int N, float **Mat, float *assignment_index, int MODE)
     for (int i = 0; i < N; i++)
         delete[] check[i];
     delete[] check;
-
     if (ans == N)
         return (1);
     return (-1);
 }
 
-void check_set(int N, float **Mat, int **check)
+void Step3_assign_mat(int N, float **Mat, int **assign, bool *row)
 {
     for (int i = 0; i < N; i++)
     {
@@ -240,63 +227,32 @@ void check_set(int N, float **Mat, int **check)
         {
             if (Mat[i][j] == 0)
             {
-                if (check[i][j] == 0)
+                if (assign[i][j] == 0)
                 {
-                    check[i][j] = 1;
+                    assign[i][j] = 1;
                     for (int k = 0; k < N; k++)
                     {
                         if (Mat[k][j] == 0 && k != i)
-                            check[k][j] = -1;
+                            assign[k][j] = -1;
                     }
                     for (int k = j + 1; k < N; k++)
                     {
                         if (Mat[i][k] == 0)
-                            check[i][k] = -1;
+                            assign[i][k] = -1;
                     }
                     break;
                 }
                 else
-                    check[i][j] = -1;
+                    assign[i][j] = -1;
             }
         }
     }
-}
-
-int Mat_change(float **Mat, int N, int M, float *assignment_index, int MODE)
-{
-    //check 배열 2차원..?
-    float MIN = FLT_MAX;
-    int **check = new int *[N];
-    bool *row = new bool[N];
-    bool *col = new bool[M];
-    int zero_cnt = 0;
-
-    //init check, row, col
-    for (int i = 0; i < N; i++)
-        check[i] = new int[M];
-    for (int i = 0; i < N; i++)
-    {
-        row[i] = false;
-        for (int j = 0; j < M; j++)
-        {
-            check[i][j] = 0;
-            col[j] = false;
-        }
-    }
-
-    int ret = 0;
-    //check init (step 3 assign)
-
-    if (is_vaild(N, Mat, assignment_index, MODE) == 1)
-        return (1);
-    check_set(N, Mat, check);
-
     for (int i = 0; i < N; i++)
     {
         bool flag = false;
-        for (int j = 0; j < M; j++)
+        for (int j = 0; j < N; j++)
         {
-            if (check[i][j] == 1)
+            if (assign[i][j] == 1)
             {
                 flag = true;
                 row[i] = false;
@@ -306,17 +262,17 @@ int Mat_change(float **Mat, int N, int M, float *assignment_index, int MODE)
         if (!flag)
             row[i] = true;
     }
+}
 
-    while (Step3_Mark(check, Mat, col, row, N, M, zero_cnt))
-    {
-    }
-
+void Step4_Mat_Change(int &N, bool *row, bool *col, float **Mat)
+{
     float MIN_VALUE = FLT_MAX;
+
     for (int i = 0; i < N; i++)
     {
         if (row[i])
         {
-            for (int j = 0; j < M; j++)
+            for (int j = 0; j < N; j++)
             {
                 if (!col[j])
                 {
@@ -326,10 +282,9 @@ int Mat_change(float **Mat, int N, int M, float *assignment_index, int MODE)
             }
         }
     }
-
     for (int i = 0; i < N; i++)
     {
-        for (int j = 0; j < M; j++)
+        for (int j = 0; j < N; j++)
         {
             if (!row[i])
             {
@@ -346,14 +301,52 @@ int Mat_change(float **Mat, int N, int M, float *assignment_index, int MODE)
                 Mat[i][j] -= MIN_VALUE;
         }
     }
+}
 
+int Mat_change(float **Mat, int N, int M, float *assignment_index, int MODE)
+{
+    float MIN = FLT_MAX;
+    int **assign = new int *[N];
+    bool *row = new bool[N];
+    bool *col = new bool[M];
+    int zero_cnt = 0;
+
+    //init assign, row, col
+    for (int i = 0; i < N; i++)
+    {
+        assign[i] = new int[M];
+        row[i] = false;
+        for (int j = 0; j < M; j++)
+        {
+            assign[i][j] = 0;
+            col[j] = false;
+        }
+    }
+    //vaildation check
+    if (is_vaild(N, Mat, assignment_index, MODE) == 1)
+    {
+        for (int i = 0; i < N; i++)
+            delete[] check[i];
+        delete[] check;
+        delete[] row;
+        delete[] col;
+        return (1);
+    }
+    Step3_assign_mat(N, Mat, assign, row);
+    while (Step3_Mark(assign, Mat, col, row, N, M, zero_cnt)){}
+    Step4_Mat_Change(N, row, col, Mat);
+
+    for (int i = 0; i < N; i++)
+            delete[] assign[i];
+    delete[] assign;
+    delete[] row;
+    delete[] col;
     return (0);
 }
 
 float Solve(float **Cost, const int N, const int M, const int MODE, float *assignment_index)
 {
     float ret;
-    float total = 0;
     float **Mat = new float *[N];
 
     for (int i = 0; i < M; i++)
@@ -363,9 +356,7 @@ float Solve(float **Cost, const int N, const int M, const int MODE, float *assig
         make_minimum_mat(Cost, Mat, N, M);
     else if (MODE == 1)
         make_maximum_mat(Cost, Mat, N, M);
-    while (Mat_change(Mat, N, M, assignment_index, MODE) == 0)
-    {
-    }
+    while (Mat_change(Mat, N, M, assignment_index, MODE) == 0){}
 
     for (int i = 0; i < N; i++)
         delete[] Mat[i];
@@ -373,32 +364,8 @@ float Solve(float **Cost, const int N, const int M, const int MODE, float *assig
     return (ret);
 }
 
-int main(void)
+void Set_Cost_Mode(float **Cost, int &N, int &M, int &MODE)
 {
-    int N, M, MODE;
-    float input;
-    float **Cost;
-    float *assignment_index;
-    float total = 0;
-    int len = 0;
-
-    cout << " Input row, column : ";
-    cin >> N >> M;
-    len = N;
-    if (N > M)
-    {
-        Cost = new float *[N];
-        for (int i = 0; i < N; i++)
-            Cost[i] = new float[N];
-    }
-    else
-    {
-        Cost = new float *[M];
-        for (int i = 0; i < M; i++)
-            Cost[i] = new float[M];
-    }
-    assignment_index = new float[N];
-
     cout << " Input Matrix : \n";
     for (int i = 0; i < N; i++)
         for (int j = 0; j < M; j++)
@@ -423,20 +390,48 @@ int main(void)
         }
         M = N;
     }
-
     cout << " Input Mode (0. Minimize, 1. Maximize): ";
     cin >> MODE;
-    Solve(Cost, N, M, MODE, assignment_index);
+}
 
+void Print_Answer(int &N, float *assignment_index, int total, float **Cost)
+{
     cout << "assignment index : ";
-    for (int i = 0; i < len; i++)
+    for (int i = 0; i < N; i++)
     {
         total += Cost[i][(int)assignment_index[i]];
         cout << assignment_index[i] << " ";
     }
-
     cout << "\n";
     cout << "Total cost : " << total;
+}
+
+int main(void)
+{
+    int N, M, MODE, ori_N;
+    float **Cost;
+    float *assignment_index;
+    float total = 0;
+
+    cout << " Input row, column : ";
+    cin >> N >> M;
+    ori_N = N;
+    if (N > M)
+    {
+        Cost = new float *[N];
+        for (int i = 0; i < N; i++)
+            Cost[i] = new float[N];
+    }
+    else
+    {
+        Cost = new float *[M];
+        for (int i = 0; i < M; i++)
+            Cost[i] = new float[M];
+    }
+    assignment_index = new float[N];
+    Set_Cost_Mode(Cost, N, M, MODE);
+    Solve(Cost, N, M, MODE, assignment_index);
+    Print_Answer(ori_N, assignment_index, total, Cost);
     for (int i = 0; i < N; i++)
         delete[] Cost[i];
     delete[] Cost;
