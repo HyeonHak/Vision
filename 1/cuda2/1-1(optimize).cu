@@ -1,4 +1,4 @@
-//나이브 코드 예시
+
 
 #include <stdio.h>
 #include <time.h>
