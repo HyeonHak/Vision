@@ -9,7 +9,7 @@
 #include "device_launch_parameters.h"
 
 #define TILE_WIDTH 8
-#define SIZE 150
+#define SIZE 512
 
 void MatrixMultiplication(const float* M, const float* N, float* P, int Width);
 __global__ void MatrixMulKernel(float* Md, float* Nd, float* Pd, int Width);
@@ -36,11 +36,10 @@ void matmult(int m, int n, int k, const float* mat_a, const float* mat_b, float*
 		== input ==
 		mat_a: m x k matrix
 		mat_b: k x n matrix
-
 		== output ==
 		mat_c: m x n matrix (output)
 	*/
-	
+
 	MatrixMultiplication(mat_a, mat_b, mat_c, SIZE);
 }
 
@@ -92,7 +91,7 @@ void MatrixMultiplication(const float* M, const float* N, float* P, int Width) {
 	int size = Width * Width * sizeof(int);
 	float *Md, *Nd, *Pd;
 
-	
+
 	// Transfer M and N to device memory
 	cudaMalloc((void**)&Md, size);
 	cudaMemcpy(Md, M, size, cudaMemcpyHostToDevice);
@@ -103,8 +102,8 @@ void MatrixMultiplication(const float* M, const float* N, float* P, int Width) {
 	cudaMalloc((void**)&Pd, size);
 
 	// Setup the execution configuration
-	dim3 dimGrid(Width / TILE_WIDTH, Width / TILE_WIDTH);
-	dim3 dimBlock(TILE_WIDTH, TILE_WIDTH);
+	dim3 dimGrid(Width, Width);
+	dim3 dimBlock(Width, Width);
 
 	// Launch the device computation threads!
 	MatrixMulKernel << <dimGrid, dimBlock >> > (Md, Nd, Pd, Width);
@@ -115,15 +114,15 @@ void MatrixMultiplication(const float* M, const float* N, float* P, int Width) {
 	cudaFree(Md);
 	cudaFree(Nd);
 	cudaFree(Pd);
-	
+
 }
 
 
 __global__ void MatrixMulKernel(float* Md, float* Nd, float* Pd, int Width) {
 	// Calculate the row index of the Pd element and M
-	int Row = blockIdx.y * TILE_WIDTH + threadIdx.y;
+	int Row = blockIdx.y * blockDim.y + threadIdx.y;
 	// Calculate the column index of Pd and N
-	int Col = blockIdx.x * TILE_WIDTH + threadIdx.x;
+	int Col = blockIdx.x * blockDim.x + threadIdx.x;
 
 	int Pvalue = 0;
 	// each thread computes one element of the bolck sub-matrix
